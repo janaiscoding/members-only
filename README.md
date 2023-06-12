@@ -1,6 +1,8 @@
-# How to create a new Express project
+# How to create a new Express project\*
 
 ### DOCUMENTATION Written by me, for me (and others that could use some how-to-steps) :3
+
+\*All of this is subject to change and possible updates will come along the way
 
 1. Navigate to the directory where you want your project folder to be created
 2. Use `express project-name --view=pug`
@@ -118,7 +120,7 @@ After you exported it, inside app we can use it by doing this:
 ```javascript
 //Import the router
 const indexRouter = require("./routes/index");
-//Tell the app that when we are on the / path, we should get the indexRouter
+//Tell the app that when we are on the / path, we should USE the indexRouter
 app.use("/", indexRouter);
 ```
 
@@ -363,19 +365,22 @@ asyncHandler(async (req, res, next) => {
 
 ```javascript
 passport.use(
+  // Here is the passport local strategy
   new LocalStrategy(async (username, password, done) => {
-    try {
-      const user = await User.findOne({ username: username });
-      if (!user) {
-        return done(null, false, { message: "Incorrect username" });
-      }
-      if (user.password !== password) {
-        return done(null, false, { message: "Incorrect password" });
-      }
-      return done(null, user);
-    } catch (err) {
-      return done(err);
-    }
+    // Fist, we see if we can find our user through the username (in our case, this will be an email address)
+    const user = await User.findOne({ username }).exec();
+    // If we did not find an user, it means there is no account associated with that email
+    if (!user) return done(null, false, { message: "Incorrect username" });
+    // Now we are using bcrypt's compare method to check the inserted password vs the hashed password
+    bcrypt.compare(password, user.password, (err, res) => {
+      // Default error case
+      if (err) return done(err);
+      // Result is true, it means comparison was successful, we have our user
+      if (res) {
+        return done(null, user);
+      } // Comparison is false, it means password was not the same
+      else return done(null, false, { message: "Incorrect password" });
+    });
   })
 );
 ```
@@ -407,4 +412,19 @@ app.post(
     failureRedirect: "/",
   })
 );
+```
+
+# How to Log out your user
+
+1. Simply create a link/button with the path of `/log-out` and write this:
+
+```javascript
+app.get("/log-out", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+});
 ```

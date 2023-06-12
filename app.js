@@ -7,6 +7,7 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("./models/user");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 
@@ -29,21 +30,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
-
+//These 3 passport middleware need to be placed before initialize()
 passport.use(
   new LocalStrategy(async (username, password, done) => {
-    try {
-      const user = await User.findOne({ username: username });
-      if (!user) {
-        return done(null, false, { message: "Incorrect username" });
-      }
-      if (user.password !== password) {
-        return done(null, false, { message: "Incorrect password" });
-      }
-      return done(null, user);
-    } catch (err) {
-      return done(err);
-    }
+    const user = await User.findOne({ username }).exec();
+    if (!user) return done(null, false, { message: "Incorrect username" });
+    bcrypt.compare(password, user.password, (err, res) => {
+      if (err) return done(err);
+      if (res) {
+        return done(null, user);
+      } else return done(null, false, { message: "Incorrect password" });
+    });
   })
 );
 
@@ -65,15 +62,19 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")));
 
 // MY ROUTES
-
-const signUpRouter = require('./routes/sign-up')
+const signUpRouter = require("./routes/sign-up");
 
 app.get("/", (req, res) => {
-  res.render("index", { title: "Members Only", user: req.user });
+  res.render("index", {
+    title: "Members Only",
+    user: req.user,
+    message: "login now",
+  });
 });
 
-app.get("/sign-up", signUpRouter);
+app.use("/sign-up", signUpRouter);
 
+// Here is how I login my user
 app.post(
   "/log-in",
   passport.authenticate("local", {
@@ -82,6 +83,15 @@ app.post(
   })
 );
 
+//Here is how I logout my user
+app.get("/log-out", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -93,7 +103,7 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
+  res.locals.currentUser = req.user;
   // render the error page
   res.status(err.status || 500);
   res.render("error");

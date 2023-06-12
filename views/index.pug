@@ -6,13 +6,13 @@ block content
    p Welcome back, #{user.first_name}
    a(href='/log-out') Log out 
   else 
-   p No user is logged in yet   
+   p No user is logged in yet  #{message}
    <br>
    h3 Sign in to your account
-   form(action="/log-in", method="post") 
+   form(action="/log-in", method="POST") 
     div.form-group
-      label(for='email') Email:
-      input#email.form-control(type='email' placeholder='Email' name='email' required='true')
+      label(for='username') Email:
+      input#username.form-control(type='email' placeholder='Email' name='username' required='true')
     div.form-group
       label(for='password') Password:
       input#password.form-control(type='password' placeholder='Password' name='password' required='true')    
