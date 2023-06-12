@@ -1,4 +1,4 @@
-# How to create a new Express project 
+# How to create a new Express project
 
 ### DOCUMENTATION Written by me, for me (and others that could use some how-to-steps) :3
 
@@ -17,7 +17,7 @@
 ```
 
 6. Replace all instances of `var` in your files with `const`
-7. Run ``npm run serverstart`` to access your app and listen to all incoming changes (you'll still have to refresh the page)
+7. Run `npm run serverstart` to access your app and listen to all incoming changes (you'll still have to refresh the page)
 
 # How to connect with MongoDB, using mongoose
 
@@ -50,9 +50,11 @@ async function main() {
 12. Important is that in your collection string, you have to add the DB name in the path before the options: `(...mongodb.net/project-name?retryWrites...)`
 
 # How to !actually! create your app
+
 Using MVC (Model, View, Controller) we need 3 folders: `models` , `views`, `controllers`
 
-# Inside `models` we will have: 
+# Inside `models` we will have:
+
 All the Schema constructors that declare how our DB data should be created and what types should it be. Just an example of a file called `example.js`:
 
 ```javascript
@@ -78,6 +80,7 @@ module.exports = mongoose.model("Example", exampleSchema);
 ```
 
 # Inside `views` we will:
+
 Write the HTML code that can be populated with values from our GET or POST HTTP methods
 
 1. In our `views` folder we can have `index.pug`
@@ -120,6 +123,7 @@ app.use("/", indexRouter);
 ```
 
 # Inside the `controllers` folder we will:
+
 Specify all the logic of what happens to our data when we are doing certain get/post requests
 
 1. In order to work with `controllers` we will need async callback functions. Install `npm install express-async-handler`
@@ -131,7 +135,7 @@ const asyncHandler = require("express-async-handler");
 
 exports.example_data = asyncHandler(async (req, res, next) => {
   const allExamples = await Example.countDocuments({}).exec();
-  //Rendering index view, passing props:
+  //Rendering index view, passing props: Inside render we only put the view name. without slash before(that is only on routes)
   res.render("index", {
     title: "Express",
     allExamples: allExamples,
@@ -149,7 +153,7 @@ const router = express.Router();
 const example_controller = require("../controllers/exampleController");
 
 /* GET home page. */
-router.get("/", example.controller.example_data);
+router.get("/", example_controller.example_data);
 // Export your router
 module.exports = router;
 ```
@@ -173,9 +177,178 @@ There are many other details such as working with `forms` data, `sanitizing` you
 5. Copy the Clone SSH URL which should look something like `https://github.com/<your_git_user_id>/project-name.git`
 6. In your parent directory paste the URL from above alongside git clone command, should look like this: `git clone https://github.com/<your_git_user_id>/project-name.git`
 7. Navigate to that freshly created folder `cd project-name`
-8. Copy all your files from your project into the fresh project directory 
+8. Copy all your files from your project into the fresh project directory
 9. `git add .` for adding all the files
 10. `git commit -m "Your first commit message"` for adding your first commit message
 11. `git push origin main` for pushing all your files. That's it! Well done :)
 
 I'll continue writing more (or revisiting details) as I am working on this project ^^
+
+# How to setup Authentication
+
+1. We will need to install `npm install express-session` , `npm install passport`, `npm install passport-local`
+2. In app.js, import all of these at the top of your file imports
+
+```javascript
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+```
+
+3. Import your User Schema
+4. In the middleware section, add the following functions
+
+```javascript
+app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+```
+
+5. Now we need a new view for when a user should sign up.
+6. Link the view with the route and controller. For example:
+
+```javascript
+//inside index.js route
+const user_controller = require("../controllers/userController");
+
+//GET Requests:
+router.get("/sign-up", user_controller.user_sign_up_get);
+//this will say that when we get /sign-up in our path, we should perform the linked controller
+
+//inside userController.js
+exports.user_sign_up_get = asyncHandler(async (req, res, next) => {
+  res.render("sign-up", {
+    title: "Sign Up",
+  });
+});
+```
+
+7. Our form is calling a POST action, so we need to write the controller logic for post also:
+
+```javascript
+//inside index.js route
+const user_controller = require("../controllers/userController");
+
+//POST Requests:
+router.post("/sign-up", user_controller.user_sign_up_post);
+//this will say that when we get /sign-up in our path, we should perform the linked controller
+
+//inside userController.js
+exports.user_sign_up_post = [
+  ,
+  //validation logic here
+  asyncHandler(async (req, res, next) => {
+    //request posting here
+    //all to be explained below
+  }),
+];
+```
+
+8. For our post logic, we need to understand the following concepts: Sanitizing, validating, and securing.
+9. Run `npm install express-validator` and import `const { body, validationResult } = require("express-validator");` inside your controllers where you have to deal with a form.
+10. This package will make sure that the user inputs are safe, and are correct according to our pre-established requirements.
+
+```javascript
+body("firstName")
+  .trim()
+  .isLength({ min: 2 })
+  .escape()
+  .withMessage("First Name must be specified")
+  .isAlphanumeric()
+  .withMessage("First name has non-alphanumeric characters");
+```
+
+11. This type of validating syntax needs to go inside the post controllers, therefore step 7. will now look like this:
+
+```javascript
+exports.user_sign_up_post = [
+  //validation logic here
+  body(
+    "first_name",
+    "First name is required, and needs to be between 2 and 24 characters."
+  )
+    .trim()
+    .isLength({ min: 2, max: 24 })
+    .escape(),
+  body(
+    "last_name",
+    "Last name is required, and needs to be between 2 and 24 characters."
+  )
+    .trim()
+    .isLength({ min: 2, max: 24 })
+    .escape(),
+  body("email", "Email is required and needs to be a valid email")
+    .trim()
+    .isEmail(),
+  body(
+    "password",
+    "Password is required, and needs to be between 8 and 24 characters"
+  )
+    .trim()
+    .isLength({ min: 8, max: 24 }),
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+    // Create your new user
+    const user = new User({
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      username: req.body.email,
+      password: req.body.password,
+      messages: [],
+    });
+    if (!errors.isEmpty()) {
+      // We found errors so we need to render the form again with sanitized values and error messages
+      res.render("sign-up", {
+        user: user,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // This means our data is valid so we can send our new user to db
+      await user.save();
+      res.redirect("/");
+    }
+  }),
+];
+```
+
+12. But now, we need to make sure that our user passwords are stored securely by using _hashed passwords_ instead. We will do this by installing `npm install bcryptjs`
+13. Import `const bcrypt = require('bcryptjs')` in your `userController.js` file
+14. Now replace the post method to create and store the hashed value instead, in the Async handler. The second part of the post array should now look like this:
+
+```javascript
+asyncHandler(async (req, res, next) => {
+  // Extract the validation errors from a request.
+  const errors = validationResult(req);
+
+  // our password is now secured
+  bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
+    if (err) {
+      console.log(err);
+    } else {
+      // Create your new user
+      const user = new User({
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        username: req.body.email,
+        password: hashedPassword,
+        messages: [],
+      });
+      if (!errors.isEmpty()) {
+        // We found errors so we need to render the form again with sanitized values and error messages
+        res.render("sign-up", {
+          user: user,
+          errors: errors.array(),
+        });
+        return;
+      } else {
+        // This means our data is valid so we can send our new user to db
+        await user.save();
+        res.redirect("/");
+      }
+    }
+  });
+});
+```
+### That's it, now your user will be stored securely in your DB. :)
