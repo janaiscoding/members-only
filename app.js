@@ -6,8 +6,7 @@ const logger = require("morgan");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-
-const indexRouter = require("./routes/index");
+const User = require("./models/user");
 
 const app = express();
 
@@ -30,11 +29,59 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        return done(null, false, { message: "Incorrect username" });
+      }
+      if (user.password !== password) {
+        return done(null, false, { message: "Incorrect password" });
+      }
+      return done(null, user);
+    } catch (err) {
+      return done(err);
+    }
+  })
+);
+
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
+// MY ROUTES
+
+const signUpRouter = require('./routes/sign-up')
+
+app.get("/", (req, res) => {
+  res.render("index", { title: "Members Only", user: req.user });
+});
+
+app.get("/sign-up", signUpRouter);
+
+app.post(
+  "/log-in",
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/",
+  })
+);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

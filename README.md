@@ -351,4 +351,60 @@ asyncHandler(async (req, res, next) => {
   });
 });
 ```
+
 ### That's it, now your user will be stored securely in your DB. :)
+
+# How to Log In your user
+
+1. PassportJS uses what they call Strategies to authenticate users
+2. We'll create a `log-in` path on our form, as an app.post for the login
+3. The Strategy needs to be placed before `app.use(passport.initialize())`
+4. We'll write the function that will be called upon authentication
+
+```javascript
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        return done(null, false, { message: "Incorrect username" });
+      }
+      if (user.password !== password) {
+        return done(null, false, { message: "Incorrect password" });
+      }
+      return done(null, user);
+    } catch (err) {
+      return done(err);
+    }
+  })
+);
+```
+
+5. We also need something called **sessions** and **serialization**, so that the users will also stay logged in (using cookies inside the browser)
+
+```javascript
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
+```
+
+6. After creating our post form with the action of `/log-in`, we can write the function that actually authenticates the user
+
+```javascript
+app.post(
+  "/log-in",
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/",
+  })
+);
+```

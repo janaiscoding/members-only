@@ -2,4 +2,21 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  if user   
+   p Welcome back, #{user.first_name}
+   a(href='/log-out') Log out 
+  else 
+   p No user is logged in yet   
+   <br>
+   h3 Sign in to your account
+   form(action="/log-in", method="post") 
+    div.form-group
+      label(for='email') Email:
+      input#email.form-control(type='email' placeholder='Email' name='email' required='true')
+    div.form-group
+      label(for='password') Password:
+      input#password.form-control(type='password' placeholder='Password' name='password' required='true')    
+    button.btn.btn-primary(type='submit') Log in 
+
+  <br>
+  a(href='/sign-up') Or create a new account 

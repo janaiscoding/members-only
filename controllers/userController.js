@@ -47,6 +47,7 @@ exports.user_sign_up_post = [
           last_name: req.body.last_name,
           username: req.body.email,
           password: hashedPassword,
+          membership_status: false,
           messages: [],
         });
         if (!errors.isEmpty()) {
