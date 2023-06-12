@@ -3,7 +3,7 @@ extends layout
 block content
   h1= title
   if user   
-   p Welcome back, #{user.first_name}
+   p Welcome back, #{user.first_name} #{user.last_name}
    a(href='/log-out') Log out 
   else 
    p No user is logged in yet  #{message}
@@ -17,6 +17,5 @@ block content
       label(for='password') Password:
       input#password.form-control(type='password' placeholder='Password' name='password' required='true')    
     button.btn.btn-primary(type='submit') Log in 
+    a(href='/sign-up') Or create a new account 
 
-  <br>
-  a(href='/sign-up') Or create a new account 

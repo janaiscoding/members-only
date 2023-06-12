@@ -63,7 +63,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // MY ROUTES
 const signUpRouter = require("./routes/sign-up");
-
+const failureRouter = require('./routes/failure')
 app.get("/", (req, res) => {
   res.render("index", {
     title: "Members Only",
@@ -73,14 +73,17 @@ app.get("/", (req, res) => {
 });
 
 app.use("/sign-up", signUpRouter);
-
+app.use('/failure', failureRouter)
 // Here is how I login my user
 app.post(
   "/log-in",
   passport.authenticate("local", {
     successRedirect: "/",
-    failureRedirect: "/",
-  })
+    failureRedirect: "/failure",
+  }),
+  function(req,res, next){
+    console.log('body ', req.body)
+  }
 );
 
 //Here is how I logout my user
