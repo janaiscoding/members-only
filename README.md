@@ -1,4 +1,6 @@
-# How to create a new Express project - DOCUMENTATION Written by me, for me (and others that could use some how-to-steps) :3
+# How to create a new Express project 
+
+### DOCUMENTATION Written by me, for me (and others that could use some how-to-steps) :3
 
 1. Navigate to the directory where you want your project folder to be created
 2. Use `express project-name --view=pug`
@@ -15,6 +17,7 @@
 ```
 
 6. Replace all instances of `var` in your files with `const`
+7. Run ``npm run serverstart`` to access your app and listen to all incoming changes (you'll still have to refresh the page)
 
 # How to connect with MongoDB, using mongoose
 
@@ -47,10 +50,10 @@ async function main() {
 12. Important is that in your collection string, you have to add the DB name in the path before the options: `(...mongodb.net/project-name?retryWrites...)`
 
 # How to !actually! create your app
+Using MVC (Model, View, Controller) we need 3 folders: `models` , `views`, `controllers`
 
-## Using MVC (Model, View, Controller) we need 3 folders: `models` , `views`, `controllers`
-
-# Inside `models` we will have all Schema constructors that declare how our DB data should be created and what types should it be. Just an example of a file called `example.js`:
+# Inside `models` we will have: 
+All the Schema constructors that declare how our DB data should be created and what types should it be. Just an example of a file called `example.js`:
 
 ```javascript
 // Require Mongoose
@@ -71,10 +74,11 @@ exampleSchema.virtual("url").get(function () {
   return `/initialpath/examplepath/${this._id}`;
 });
 //Exporting the Schema
-const Example = mongoose.model("Example", exampleSchema);
+module.exports = mongoose.model("Example", exampleSchema);
 ```
 
-# Inside `views` we will write the HTML code that can be populated with values from our GET or POST HTTP methods
+# Inside `views` we will:
+Write the HTML code that can be populated with values from our GET or POST HTTP methods
 
 1. In our `views` folder we can have `index.pug`
 
@@ -115,7 +119,8 @@ const indexRouter = require("./routes/index");
 app.use("/", indexRouter);
 ```
 
-# Inside `controllers` folder we will specify all the logic of what happens to our data when we are doing certain get/post requests
+# Inside the `controllers` folder we will:
+Specify all the logic of what happens to our data when we are doing certain get/post requests
 
 1. In order to work with `controllers` we will need async callback functions. Install `npm install express-async-handler`
 2. One example of controller file `exampleController.js`:
