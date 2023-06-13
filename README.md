@@ -10,6 +10,16 @@ I've written below the steps of making this app from scratch, using my language 
 
 PSA: For now, styling is not a priority. This was a purely Express + Auth + Mongoose orinted project. Might return later to fix this stuff if I believe this is a worthy project.
 
+# INSTALLING 
+``` 
+git clone git@github.com:janaiscoding/members-only.git
+cd members-only 
+npm install 
+npm run serverstart 
+go to localhost:3000
+enjoy!
+```
+
 # How to create a new Express project
 
 ### DOCUMENTATION Written by me, for me (and others that could use some how-to-steps) :3
