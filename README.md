@@ -1,8 +1,19 @@
-# How to create a new Express project\*
+# MEMBERS ONLY PROJECT
+
+This is an Express App that lets you see all the messages on the platform.
+You can create an user, but you won't be able to see who wrote what message until you click `Join the club`.
+User Auth is done with [passportJS](http://www.passportjs.org/), passwords are secured using [bcryptjs](https://www.npmjs.com/package/bcryptjs). Email authentication, unique.
+You can click `Leave the club` to go back to anon-only view.
+
+I've written below the steps of making this app from scratch, using my language - mostly to revise and be able to re-read and understand everything better.
+
+PSA: For now, styling is not a priority. This was a purely Express + Auth + Mongoose orinted project. Might return later to fix this stuff if I believe this is a worthy project.
+
+# How to create a new Express project
 
 ### DOCUMENTATION Written by me, for me (and others that could use some how-to-steps) :3
 
-\*All of this is subject to change and possible updates will come along the way
+All of this is subject to change and possible updates will come along the way
 
 1. Navigate to the directory where you want your project folder to be created
 2. Use `express project-name --view=pug`
@@ -413,8 +424,10 @@ app.post(
   })
 );
 ```
-If authentication doesn't get called you can fix that by adding a new argument to the post function to check your `req.body`, like this: 
-```javascript 
+
+If authentication doesn't get called you can fix that by adding a new argument to the post function to check your `req.body`, like this:
+
+```javascript
 app.post(
   "/log-in",
   passport.authenticate("local", {
@@ -422,11 +435,12 @@ app.post(
     failureRedirect: "/failure",
   }),
   //extra
-  function(req,res, next){
-    console.log('body ', req.body)
+  function (req, res, next) {
+    console.log("body ", req.body);
   }
 );
 ```
+
 # How to Log out your user
 
 1. Simply create a link/button with the path of `/log-out` and write this:
@@ -440,4 +454,40 @@ app.get("/log-out", (req, res, next) => {
     res.redirect("/");
   });
 });
+```
+
+# HOW TO DEPLOY WITH RAILWAY
+
+1. Install `npm install compression` and add it to your `app.js` :
+
+```javascript
+const compression = require("compression");
+app.use(compression()); // Compress all routes
+//This should appear before any routes you want compressed — in this case, all of them!
+```
+
+2. Install Helmet to protect against well known vulnerabilities `npm install helmet`
+
+```javascript
+const helmet = require("helmet");
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  })
+);
+```
+3. Add rate limiting to the API routes `npm install express-rate-limit`
+```javascript
+const RateLimit = require("express-rate-limit");
+
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
+
 ```

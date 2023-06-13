@@ -3,19 +3,32 @@ extends layout
 block content
   h1= title
   if user   
-   p Welcome back, #{user.first_name} #{user.last_name} 
-   a(href=`/join/${user._id}`) Join the club 
-   a(href='/log-out') Log out 
-   form(action='' method='post')
-      div.form-group 
-        label(for='title') title: 
-        input#title.form-control(type='text' placeholder='ur title' name='title' required='true')  
-      div.form-group 
-        label(for='message') message: 
-        input#message.form-control(type='text' placeholder='ur message' name='message' required='true')
-
-  else 
-   p No user is logged in yet  #{message}
+   p Welcome back, #{user.first_name}
+   a(href='/log-out') Log out<br>   
+  form(action='' method='post')
+    div.form-group 
+      label(for='title') Title: 
+      input#title.form-control(type='text' placeholder='ur title' name='title' required='true' value=(undefined===message ? "": message.title))  
+    div.form-group 
+      label(for='text') Text: 
+      input#text.form-control(type='text' placeholder='ur text' name='text' required='true' value=(undefined===message ? "": message.text))
+    button.btn.btn-primary(type='submit') Send     
+    if errors
+      ul
+        for error in errors
+          li!= error.msg    
+    if user.membership_status
+      a(href=`/leave/${user._id}`) Leave the club 
+      ul
+        each val in allMessages   
+          li #{val.title} - #{val.text} written by #{val.user.first_name} #{val.user.last_name}
+    else 
+      a(href=`/join/${user._id}`) Join the club 
+      ul
+        each val in allMessages   
+            li #{val.title} - #{val.text} written by Anon           
+  if !user
+   p No user is logged in yet
    <br>
    h3 Sign in to your account
    form(action="/log-in", method="POST") 
@@ -28,3 +41,6 @@ block content
     button.btn.btn-primary(type='submit') Log in 
     a(href='/sign-up') Or create a new account 
 
+    ul
+      each val in allMessages   
+        li #{val.title} - #{val.text} written by Anon

@@ -3,7 +3,10 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const compression = require("compression");
+const helmet = require("helmet");
 const session = require("express-session");
+const RateLimit = require("express-rate-limit");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("./models/user");
@@ -24,12 +27,26 @@ async function main() {
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
-
+app.use(compression());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  })
+);
+
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
 //These 3 passport middleware need to be placed before initialize()
 passport.use(
   new LocalStrategy(async (username, password, done) => {
@@ -64,14 +81,13 @@ app.use(express.static(path.join(__dirname, "public")));
 // MY ROUTES
 const signUpRouter = require("./routes/sign-up");
 const failureRouter = require("./routes/failure");
-app.get("/", (req, res) => {
-  res.render("index", {
-    title: "Members Only",
-    user: req.user,
-    message: "login now",
-  });
-});
 
+//homepage
+const message_controller = require("./controllers/messageController");
+app.get("/", message_controller.message_get);
+app.post("/", message_controller.message_post);
+
+//auth logic
 app.use("/sign-up", signUpRouter);
 app.use("/failure", failureRouter);
 // Here is how I login my user
@@ -97,8 +113,9 @@ app.get("/log-out", (req, res, next) => {
 });
 // Here is where I change the membership status
 const user_controller = require("./controllers/userController");
+app.get("/join/:id", user_controller.user_join);
+app.get("/leave/:id", user_controller.user_leave);
 
-app.get('/join/:id', user_controller.user_join)
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

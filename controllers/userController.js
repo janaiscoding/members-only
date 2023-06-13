@@ -48,7 +48,6 @@ exports.user_sign_up_post = [
           username: req.body.email,
           password: hashedPassword,
           membership_status: false,
-          messages: [],
         });
         if (!errors.isEmpty()) {
           // We found errors so we need to render the form again with sanitized values and error messages
@@ -76,7 +75,20 @@ exports.user_join = asyncHandler(async (req, res, next) => {
     username: initialUser.username,
     password: initialUser.password,
     membership_status: true,
-    messages: initialUser.messages,
+  });
+  await User.findByIdAndUpdate(req.params.id, updatedUser);
+  res.redirect("/");
+});
+
+exports.user_leave = asyncHandler(async (req, res, next) => {
+  let initialUser = await User.findById(req.params.id);
+  let updatedUser = new User({
+    _id: req.params.id,
+    first_name: initialUser.first_name,
+    last_name: initialUser.last_name,
+    username: initialUser.username,
+    password: initialUser.password,
+    membership_status: false,
   });
   await User.findByIdAndUpdate(req.params.id, updatedUser);
   res.redirect("/");
