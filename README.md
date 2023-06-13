@@ -491,3 +491,13 @@ const limiter = RateLimit({
 app.use(limiter);
 
 ```
+4. Commit all your changes to your GitHub.
+5. Go to [Railway.app](https://railway.app/) and login with your account, then go to your [dashboard](https://railway.app/dashboard)
+6. Click `New Project` and choose `Deploy from GitHub repo` and select your prefered GitHub repo
+7. Click `Deploy Now`, after a few seconds the project will be generated.
+8. Settings Tab -> Domains -> `Generate Domain`. Now you have your app link [Members only](https://members-only-production-038a.up.railway.app/)
+9. Time to connect it to your MongoDB Database. From the project's dashboard, click `New`, `Database`, `Add MongoDB`.
+10. On the MongoDB Panel, click `Connect` and copy the `Mongo Connection URL`.
+11. Go back to your project Panel and go to `Variables` where you will add your new key with the name of your project's variable in your `app.js`, in my case it will always be `MONGODB_URL`. Click add.
+12. Another needed variable is `NODE_ENV` : `production`
+12. Check your app, it should be working now!

@@ -41,6 +41,7 @@ block content
     button.btn.btn-primary(type='submit') Log in 
     a(href='/sign-up') Or create a new account 
 
+  if allMessages  
     ul
       each val in allMessages   
         li #{val.title} - #{val.text} written by Anon
