@@ -5,6 +5,10 @@ block content
   if user   
    p Welcome back, #{user.first_name} #{user.last_name}
    a(href='/log-out') Log out 
+   form(action='' method='post')
+      div.form-group 
+        label(for='message') title: 
+        input#message.form-control(type='text' placeholder='ur title' name='title' required='true')  
   else 
    p No user is logged in yet  #{message}
    <br>

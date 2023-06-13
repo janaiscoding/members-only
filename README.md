@@ -409,11 +409,24 @@ app.post(
   "/log-in",
   passport.authenticate("local", {
     successRedirect: "/",
-    failureRedirect: "/",
+    failureRedirect: "/failure",
   })
 );
 ```
-
+If authentication doesn't get called you can fix that by adding a new argument to the post function to check your `req.body`, like this: 
+```javascript 
+app.post(
+  "/log-in",
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/failure",
+  }),
+  //extra
+  function(req,res, next){
+    console.log('body ', req.body)
+  }
+);
+```
 # How to Log out your user
 
 1. Simply create a link/button with the path of `/log-out` and write this:
