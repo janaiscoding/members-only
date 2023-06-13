@@ -22,13 +22,13 @@ block content
         if allMessages    
           ul
             each val in allMessages   
-              li #{val.title} - #{val.text} written by #{val.user.first_name} #{val.user.last_name}
+              li #{val.title} - #{val.text} written by #{val.user.first_name} #{val.user.last_name}, at #{val.time}
       else 
         a(href=`/join/${user._id}`) Join the club 
         if allMessages  
         ul
           each val in allMessages   
-              li #{val.title} - #{val.text} written by Anon           
+              li #{val.title} - #{val.text} written by Anon, at #{val.time}          
   if !user
    p No user is logged in yet
    <br>
@@ -45,4 +45,4 @@ block content
     if allMessages  
       ul
         each val in allMessages   
-          li #{val.title} - #{val.text} written by Anon 
+          li #{val.title} - #{val.text} written by Anon, at #{val.time}
