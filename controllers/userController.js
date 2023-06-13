@@ -66,3 +66,18 @@ exports.user_sign_up_post = [
     });
   }),
 ];
+
+exports.user_join = asyncHandler(async (req, res, next) => {
+  let initialUser = await User.findById(req.params.id);
+  let updatedUser = new User({
+    _id: req.params.id,
+    first_name: initialUser.first_name,
+    last_name: initialUser.last_name,
+    username: initialUser.username,
+    password: initialUser.password,
+    membership_status: true,
+    messages: initialUser.messages,
+  });
+  await User.findByIdAndUpdate(req.params.id, updatedUser);
+  res.redirect("/");
+});

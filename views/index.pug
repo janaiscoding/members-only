@@ -3,12 +3,17 @@ extends layout
 block content
   h1= title
   if user   
-   p Welcome back, #{user.first_name} #{user.last_name}
+   p Welcome back, #{user.first_name} #{user.last_name} 
+   a(href=`/join/${user._id}`) Join the club 
    a(href='/log-out') Log out 
    form(action='' method='post')
       div.form-group 
-        label(for='message') title: 
-        input#message.form-control(type='text' placeholder='ur title' name='title' required='true')  
+        label(for='title') title: 
+        input#title.form-control(type='text' placeholder='ur title' name='title' required='true')  
+      div.form-group 
+        label(for='message') message: 
+        input#message.form-control(type='text' placeholder='ur message' name='message' required='true')
+
   else 
    p No user is logged in yet  #{message}
    <br>

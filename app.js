@@ -63,7 +63,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // MY ROUTES
 const signUpRouter = require("./routes/sign-up");
-const failureRouter = require('./routes/failure')
+const failureRouter = require("./routes/failure");
 app.get("/", (req, res) => {
   res.render("index", {
     title: "Members Only",
@@ -73,7 +73,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/sign-up", signUpRouter);
-app.use('/failure', failureRouter)
+app.use("/failure", failureRouter);
 // Here is how I login my user
 app.post(
   "/log-in",
@@ -81,8 +81,8 @@ app.post(
     successRedirect: "/",
     failureRedirect: "/failure",
   }),
-  function(req,res, next){
-    console.log('body ', req.body)
+  function (req, res, next) {
+    console.log("body ", req.body);
   }
 );
 
@@ -95,7 +95,10 @@ app.get("/log-out", (req, res, next) => {
     res.redirect("/");
   });
 });
+// Here is where I change the membership status
+const user_controller = require("./controllers/userController");
 
+app.get('/join/:id', user_controller.user_join)
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
@@ -106,7 +109,6 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-  res.locals.currentUser = req.user;
   // render the error page
   res.status(err.status || 500);
   res.render("error");
