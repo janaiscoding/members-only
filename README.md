@@ -1,5 +1,6 @@
 # MEMBERS ONLY PROJECT
 
+[Live deploy on Railway](https://members-only-production-038a.up.railway.app/)
 This is an Express App that lets you see all the messages on the platform.
 You can create an user, but you won't be able to see who wrote what message until you click `Join the club`.
 User Auth is done with [passportJS](http://www.passportjs.org/), passwords are secured using [bcryptjs](https://www.npmjs.com/package/bcryptjs). Email authentication, unique.
@@ -495,9 +496,6 @@ app.use(limiter);
 5. Go to [Railway.app](https://railway.app/) and login with your account, then go to your [dashboard](https://railway.app/dashboard)
 6. Click `New Project` and choose `Deploy from GitHub repo` and select your prefered GitHub repo
 7. Click `Deploy Now`, after a few seconds the project will be generated.
-8. Settings Tab -> Domains -> `Generate Domain`. Now you have your app link [Members only](https://members-only-production-038a.up.railway.app/)
-9. Time to connect it to your MongoDB Database. From the project's dashboard, click `New`, `Database`, `Add MongoDB`.
-10. On the MongoDB Panel, click `Connect` and copy the `Mongo Connection URL`.
-11. Go back to your project Panel and go to `Variables` where you will add your new key with the name of your project's variable in your `app.js`, in my case it will always be `MONGODB_URL`. Click add.
+8. Settings Tab -> Dohttps://members-only-production-038a.up.railway.app/ project Panel and go to `Variables` where you will add your new key with the name of your project's variable in your `app.js`, in my case it will always be `MONGODB_URL`. Click add.
 12. Another needed variable is `NODE_ENV` : `production`
 12. Check your app, it should be working now!
