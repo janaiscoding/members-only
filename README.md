@@ -16,9 +16,10 @@ git clone git@github.com:janaiscoding/members-only.git
 cd members-only 
 npm install 
 npm run serverstart 
+```
+create your MONGODB_URL connection string and add it to a .env file in the root directory (or just add it to app.js) - see more details below
 go to localhost:3000
 enjoy!
-```
 
 # How to create a new Express project
 
