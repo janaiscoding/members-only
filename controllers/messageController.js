@@ -5,7 +5,7 @@ const { body, validationResult } = require("express-validator");
 exports.message_get = asyncHandler(async (req, res, next) => {
   // getting all messages on the board while populating user info
   const allMessages = await Message.find()
-    .sort({ timestamp: 1 })
+    .sort({ createdAt: "desc" })
     .populate("user")
     .exec();
 
@@ -18,11 +18,17 @@ exports.message_get = asyncHandler(async (req, res, next) => {
 
 exports.message_post = [
   //validation logic here
-  body("title", "Title is required and needs to be between 1 and 50 characters long.")
+  body(
+    "title",
+    "Title is required and needs to be between 1 and 50 characters long."
+  )
     .trim()
     .isLength({ min: 1, max: 50 })
     .escape(),
-  body("text", "Message is required and needs to be between 1 and 100 characters long.")
+  body(
+    "text",
+    "Message is required and needs to be between 1 and 100 characters long."
+  )
     .trim()
     .isLength({ min: 1, max: 100 })
     .escape(),
@@ -39,9 +45,9 @@ exports.message_post = [
     if (!errors.isEmpty()) {
       // We found errors so we need to render the form again with sanitized values and error messages
       const allMessages = await Message.find()
-        .sort({ timestamp: 1 })
-        .populate("user")
-        .exec();
+      .sort({ createdAt: "desc" })
+      .populate("user")
+      .exec();
       res.render("index", {
         message: message,
         user: req.user,
