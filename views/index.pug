@@ -23,6 +23,8 @@ block content
           ul
             each val in allMessages   
               li #{val.title} - #{val.text} written by #{val.user.first_name} #{val.user.last_name}, at #{val.time}
+                if user.admin_status 
+                  a(href='/delete') Delete
       else 
         a(href=`/join/${user._id}`) Join the club 
         if allMessages  

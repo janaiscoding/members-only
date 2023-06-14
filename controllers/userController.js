@@ -48,6 +48,7 @@ exports.user_sign_up_post = [
           username: req.body.email,
           password: hashedPassword,
           membership_status: false,
+          admin_status: false,
         });
         if (!errors.isEmpty()) {
           // We found errors so we need to render the form again with sanitized values and error messages
@@ -75,6 +76,7 @@ exports.user_join = asyncHandler(async (req, res, next) => {
     username: initialUser.username,
     password: initialUser.password,
     membership_status: true,
+    admin_status: false,
   });
   await User.findByIdAndUpdate(req.params.id, updatedUser);
   res.redirect("/");
