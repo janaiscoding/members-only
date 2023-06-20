@@ -20,19 +20,25 @@ block content
       if user.membership_status
         a(href=`/leave/${user._id}`) Leave the club 
         if allMessages    
-          ul
+          ul.d-flex.flex-column
+            h1.text-center Recent messages on this platform
             each val in allMessages   
-              li #{val.title} - #{val.text} written by #{val.user.first_name} #{val.user.last_name}, at #{val.time}
-                if user.admin_status 
-                  a(href='/delete') Delete
+              li 
+                h3 #{val.title} 
+                p #{val.text} 
+                p ~ written by #{val.user.first_name} #{val.user.last_name}, at #{val.time}      
       else 
         a(href=`/join/${user._id}`) Join the club 
         if allMessages  
-        ul
-          each val in allMessages   
-              li #{val.title} - #{val.text} written by Anon, at #{val.time}          
+          ul.d-flex.flex-column
+            h1.text-center Recent messages on this platform
+            each val in allMessages   
+              li 
+                h3 #{val.title} 
+                p #{val.text} 
+                p ~ written by Anon, at #{val.time}         
   if !user
-   p No user is logged in yet
+   p Please login or create a new account
    <br>
    h3 Sign in to your account
    form(action="/log-in", method="POST") 
@@ -43,8 +49,13 @@ block content
       label(for='password') Password:
       input#password.form-control(type='password' placeholder='Password' name='password' required='true')    
     button.btn.btn-primary(type='submit') Log in 
+    p Test account: test@mail.com / testmail123
     a(href='/sign-up') Or create a new account 
     if allMessages  
-      ul
+      ul.d-flex.flex-column
+        h1.text-center Recent messages on this platform
         each val in allMessages   
-          li #{val.title} - #{val.text} written by Anon, at #{val.time}
+          li 
+            h3 #{val.title} 
+            p #{val.text} 
+            p ~ written by Anon, at #{val.time}

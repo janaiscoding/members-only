@@ -1,13 +1,17 @@
 const Message = require("../models/message");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
-
+const validator = require("validator");
 exports.message_get = asyncHandler(async (req, res, next) => {
   // getting all messages on the board while populating user info
   const allMessages = await Message.find()
     .sort({ createdAt: "desc" })
     .populate("user")
     .exec();
+  allMessages.map((m) => {
+    m.text = validator.unescape(m.text);
+    m.title = validator.unescape(m.title);
+  });
 
   res.render("index", {
     title: "Members Only",
@@ -45,9 +49,9 @@ exports.message_post = [
     if (!errors.isEmpty()) {
       // We found errors so we need to render the form again with sanitized values and error messages
       const allMessages = await Message.find()
-      .sort({ createdAt: "desc" })
-      .populate("user")
-      .exec();
+        .sort({ createdAt: "desc" })
+        .populate("user")
+        .exec();
       res.render("index", {
         message: message,
         user: req.user,
